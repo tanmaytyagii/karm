@@ -1,0 +1,94 @@
+/* ============ KARM — 004 : KAHANIYAN ============ */
+
+.kahaniyan { background: linear-gradient(180deg, var(--bg-0), var(--bg-1) 50%, var(--bg-0)); }
+
+.kahani__list {
+  max-width: var(--maxw);
+  margin-inline: auto;
+  border-top: 1px solid var(--hair);
+}
+
+.kahani {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 15rem);
+  align-items: baseline;
+  gap: clamp(1rem, 3vw, 2.4rem);
+  width: 100%;
+  padding: clamp(1.4rem, 3.4vw, 2.3rem) 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+.kahani::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(200,169,107,.08), transparent 62%);
+  opacity: 0;
+  transition: opacity .6s var(--soft);
+}
+.kahani::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .8s var(--cine);
+}
+.kahani:hover::before, .kahani:focus-visible::before { opacity: 1; }
+.kahani:hover::after, .kahani:focus-visible::after { transform: scaleX(1); }
+
+.kahani__num { position: relative; color: var(--ink-4); transition: color .5s var(--soft); }
+.kahani:hover .kahani__num { color: var(--gold); }
+
+.kahani__name {
+  position: relative;
+  display: block;
+  font-family: var(--serif);
+  font-size: clamp(1.9rem, 5.4vw, 3.3rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.01em;
+  color: var(--ink-2);
+  transition: color .5s var(--soft), transform .8s var(--cine);
+}
+.kahani:hover .kahani__name, .kahani:focus-visible .kahani__name {
+  color: var(--ink);
+  transform: translateX(10px);
+}
+.kahani__en {
+  position: relative;
+  display: block;
+  margin-top: .55rem;
+  color: var(--ink-4);
+}
+
+.kahani__hint {
+  position: relative;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--t-body);
+  line-height: 1.5;
+  color: var(--ink-4);
+  text-align: right;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity .6s var(--soft), transform .7s var(--cine);
+}
+.kahani:hover .kahani__hint, .kahani:focus-visible .kahani__hint { opacity: 1; transform: none; }
+
+@media (max-width: 820px) {
+  .kahani { grid-template-columns: 3.2rem minmax(0, 1fr); gap: 1rem; }
+  .kahani__hint { display: none; }
+  .kahani:hover .kahani__name, .kahani:focus-visible .kahani__name { transform: none; }
+}
+
+.kahani__title { position: relative; min-width: 0; }

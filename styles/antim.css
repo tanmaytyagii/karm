@@ -1,0 +1,74 @@
+/* ============ KARM — 007 : THE RETURN ============ */
+
+.antim { position: relative; height: 480vh; --ap: 0; background: #000; }
+
+.antim__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 460px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
+}
+
+.antim__lines {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 44rem);
+  padding-inline: var(--gutter);
+  text-align: center;
+}
+.antim__lines p {
+  grid-area: 1 / 1;
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: var(--t-lg);
+  line-height: 1.34;
+  color: var(--ink);
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  filter: blur(5px);
+  transition: opacity 1.5s var(--cine), transform 1.5s var(--cine), filter 1.5s var(--cine);
+  text-wrap: balance;
+}
+.antim__lines p.is-on { opacity: 1; transform: none; filter: none; }
+
+.antim__mark {
+  font-size: var(--t-xxl) !important;
+  letter-spacing: .2em;
+  text-indent: .2em;
+  color: var(--ink) !important;
+  text-shadow: 0 0 70px rgba(200,169,107,.18);
+}
+
+.antim__couplet { display: grid; gap: .2rem; }
+.antim__couplet span { display: block; }
+.antim__couplet span:first-child { color: var(--gold-2); }
+
+/* ---------- the end plate ---------- */
+.end {
+  display: grid;
+  place-items: center;
+  gap: 1.6rem;
+  min-height: 62svh;
+  padding: clamp(5rem, 14vh, 9rem) var(--gutter) calc(env(safe-area-inset-bottom, 0px) + clamp(3rem, 8vh, 5rem));
+  background: #000;
+  text-align: center;
+}
+.end__mark {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(2.6rem, 9vw, 4.6rem);
+  line-height: 1;
+  letter-spacing: .22em;
+  text-indent: .22em;
+  color: var(--ink);
+}
+.end__meta { color: var(--ink-4); letter-spacing: .42em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .antim { height: 300vh; }
+}

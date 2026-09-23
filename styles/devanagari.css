@@ -1,0 +1,79 @@
+/* ============================================================
+   KARM — Devanagari typography layer
+   Loaded last. It changes no colour, spacing, layout or motion.
+   It only teaches the existing design how to set Hindi:
+     · no synthetic italics (Noto Serif Devanagari has no italic)
+     · no Latin-style tracking, which pulls matras off their base
+     · leading with room for the marks above and below the line
+   ============================================================ */
+
+:lang(hi) {
+  font-style: normal;
+  font-synthesis-style: none;
+  letter-spacing: normal;
+}
+
+/* Devanagari carries no case, so Latin's small-caps sizes read too small.
+   Labels come up a step; the Latin metadata (KARM / 001) is untouched. */
+.meta:lang(hi)          { font-size: clamp(.72rem, .92vw, .8rem); }
+.hot__label:lang(hi)    { font-size: clamp(.74rem, .95vw, .84rem); }
+.nav__links a:lang(hi),
+.burger:lang(hi),
+.sound__label:lang(hi)  { font-size: clamp(.76rem, .98vw, .86rem); }
+.btn:lang(hi),
+.choice:lang(hi)        { font-size: clamp(.74rem, .95vw, .82rem); }
+
+/* small labels keep a whisper of tracking instead of wide Latin caps */
+.meta:lang(hi)          { letter-spacing: .08em; }
+.hot__label:lang(hi)    { letter-spacing: .1em; }
+.nav__links a:lang(hi)  { letter-spacing: .13em; }
+.burger:lang(hi),
+.sound__label:lang(hi)  { letter-spacing: .13em; }
+.btn:lang(hi),
+.choice:lang(hi)        { letter-spacing: .1em; }
+
+/* ---------- leading ---------- */
+.shead__title:lang(hi)    { line-height: 1.22; }
+.shead__sub:lang(hi)      { line-height: 1.5; }
+.hero__line:lang(hi)      { line-height: 1.5; }
+.hero__whisper p:lang(hi) { line-height: 1.44; }
+.navmenu__links a:lang(hi){ line-height: 1.26; }
+.place__name:lang(hi)     { line-height: 1.24; }
+.kahani__name:lang(hi)    { line-height: 1.22; }
+.kahani__hint:lang(hi)    { line-height: 1.6; }
+.trio__word:lang(hi)      { line-height: 1.24; }
+.trio__text:lang(hi)      { line-height: 1.55; }
+.hint:lang(hi)            { line-height: 1.55; }
+.twin__line:lang(hi)      { line-height: 1.5; }
+.twin__link:lang(hi)      { line-height: 1.5; }
+.twin__couplet p:lang(hi) { line-height: 1.5; }
+.overlay__title:lang(hi)  { line-height: 1.2; }
+.overlay__text:lang(hi)   { line-height: 1.52; }
+.q__text:lang(hi)         { line-height: 1.48; }
+.q__echo p:lang(hi)       { line-height: 1.52; }
+.aaina__ask:lang(hi)      { line-height: 1.42; }
+.aaina__close p:lang(hi)  { line-height: 1.4; }
+.frag:lang(hi)            { line-height: 1.62; }
+.deewar__mark:lang(hi)    { line-height: 1.48; }
+.antim__lines p:lang(hi)  { line-height: 1.48; }
+
+/* the hairline sits with the first line of a taller Devanagari line */
+.frag:lang(hi)::before { margin-top: .82em; }
+
+/* ---------- reserved space, re-measured for the taller script ---------- */
+.hisaab__panel  { min-height: 22rem; }
+.overlay__scene { min-height: 12.5rem; }
+.deewar__mark   { min-height: 3.4em; }
+
+@media (max-width: 900px) {
+  .hisaab__panel { min-height: 0; }
+}
+@media (max-width: 560px) {
+  .overlay__scene { min-height: 15rem; }
+}
+
+/* Devanagari has no case; a brick word reads better a shade larger */
+.brick__word:lang(hi) {
+  font-size: clamp(.62rem, 1.15vw, .78rem);
+  letter-spacing: .04em;
+}

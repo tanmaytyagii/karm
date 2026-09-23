@@ -1,0 +1,101 @@
+/* ============ KARM — 006 : DEEWAR ============ */
+
+.deewar { background: var(--bg-0); }
+
+.deewar__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, .9fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+  max-width: var(--maxw);
+  margin-inline: auto;
+}
+
+.deewar__wallwrap {
+  position: relative;
+  background: #060504;
+  box-shadow: 0 34px 100px -44px rgba(0,0,0,.95);
+  --lit: 0;
+}
+.deewar__light {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(64% 70% at 50% 46%, rgba(216,190,131,.68), transparent 72%),
+    radial-gradient(100% 100% at 50% 50%, rgba(166,107,77,.34), transparent 78%);
+  opacity: var(--lit);
+  transition: opacity 1.4s var(--soft);
+}
+.deewar__wall { position: relative; width: 100%; overflow: hidden; }
+
+.deewar__wall .slot { background: transparent; box-shadow: none; }
+.deewar__wall .slot .brick {
+  transform-origin: 50% 50%;
+  transition: transform 1.15s var(--cine), opacity 1.05s var(--soft), filter .6s var(--soft);
+}
+.deewar__wall .slot .brick:hover { filter: brightness(1.2); }
+.deewar__wall .slot .brick:hover .brick__word { color: var(--gold-2); }
+
+.deewar__wall .slot.is-gone { pointer-events: none; }
+.deewar__wall .slot.is-gone .brick {
+  opacity: 0;
+  transform:
+    perspective(620px)
+    translate3d(var(--ox, 5px), 9%, -130px)
+    rotate(var(--orot, 5deg))
+    scale(.9);
+}
+.deewar__wall .slot.is-gone::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: radial-gradient(70% 80% at 50% 50%, rgba(216,190,131,.5), rgba(200,169,107,.12) 72%, transparent);
+  box-shadow: 0 0 20px rgba(216,190,131,.3);
+  animation: gapOpen 1.2s var(--soft) both;
+}
+@keyframes gapOpen {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.deewar__side { display: grid; gap: clamp(1.4rem, 3vw, 2rem); align-content: start; }
+.deewar__count { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+.deewar__frags { display: grid; gap: 1rem; min-height: 9rem; align-content: start; }
+.frag {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr;
+  gap: .4rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--t-body);
+  line-height: 1.5;
+  color: var(--ink-3);
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition: opacity 1s var(--cine), transform 1s var(--cine);
+}
+.frag.is-in { opacity: 1; transform: none; }
+.frag.is-out { opacity: 0; transform: translate3d(0, -8px, 0); }
+.frag::before { content: ""; height: 1px; margin-top: .75em; background: var(--gold); opacity: .5; }
+
+.deewar__mark {
+  min-height: 3.2em;
+  font-family: var(--serif);
+  font-size: var(--t-md);
+  line-height: 1.34;
+  color: var(--gold-2);
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition: opacity 1.3s var(--cine), transform 1.3s var(--cine);
+  text-wrap: pretty;
+}
+.deewar__mark.is-in { opacity: 1; transform: none; }
+
+.deewar__side .btn { justify-self: start; }
+
+@media (max-width: 900px) {
+  .deewar__stage { grid-template-columns: 1fr; }
+  .deewar__frags { min-height: 0; }
+  .deewar__mark { min-height: 0; }
+}

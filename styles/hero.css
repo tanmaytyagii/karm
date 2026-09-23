@@ -1,0 +1,256 @@
+/* ============ KARM — 000 : THE RETURN ============ */
+
+.hero {
+  position: relative;
+  height: 230vh;
+  --p: 0;
+}
+
+.hero__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 520px;
+  overflow: hidden;
+  background: var(--bg-0);
+}
+
+.hero__atmos {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(74% 46% at 50% 104%, rgba(166,107,77,.17), transparent 68%),
+    radial-gradient(40% 30% at 50% 22%, rgba(200,169,107,.045), transparent 72%);
+  opacity: calc(.35 + var(--p) * .9);
+}
+
+/* ---------- the wall ---------- */
+.hero__stage {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 88%;
+  transform:
+    translate3d(0, calc(var(--p) * 16vh), 0)
+    scale(calc(1 + var(--p) * 3.6));
+  opacity: calc(1.25 - var(--p) * .55);
+  will-change: transform;
+}
+
+.hero__wall {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 116%;
+  transform: translateX(-50%);
+}
+/* the courses nearest the top sit back in the dark */
+.hero__wall::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg,
+      rgba(8,7,6,.95) 0,
+      rgba(8,7,6,.62) 38px,
+      rgba(8,7,6,.2) 92px,
+      rgba(8,7,6,0) 160px),
+    linear-gradient(180deg, transparent 58%, rgba(8,7,6,.42) 100%);
+}
+
+.hero__wall .brick { opacity: 0; }
+.hero__wall .brick.is-falling {
+  animation: brickFall var(--dur, 820ms) both;
+  animation-delay: var(--delay, 0ms);
+}
+.hero__wall .brick.is-set { opacity: 1; }
+
+@keyframes brickFall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -112svh, 0) rotate(var(--rot, -3deg));
+    animation-timing-function: cubic-bezier(.55,.06,.68,.19);
+  }
+  7%  { opacity: 1; }
+  66% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    animation-timing-function: cubic-bezier(.2,.9,.3,1);
+  }
+  73% { transform: translate3d(0, 2.5%, 0) scale(1.035, .93); }
+  84% { transform: translate3d(0, 0, 0) scale(.994, 1.012); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* dust at the moment of landing */
+.hero__wall .brick > .dust {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 160%;
+  height: 130%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: radial-gradient(52% 58% at 50% 100%, rgba(166,107,77,.42), transparent 70%);
+  opacity: 0;
+}
+.hero__wall .brick.is-falling > .dust {
+  animation: brickDust 900ms ease-out both;
+  animation-delay: calc(var(--delay, 0ms) + var(--dur, 820ms) * .66);
+}
+@keyframes brickDust {
+  0%   { opacity: 0; transform: translateX(-50%) scale(.4); }
+  16%  { opacity: .85; }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.9) translateY(-34%); }
+}
+
+/* ---------- drifting dust motes ---------- */
+.hero__dust { position: absolute; inset: 0; pointer-events: none; }
+.hero__dust i {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(216,190,131,.5);
+  opacity: 0;
+  animation: mote var(--t, 24s) linear infinite;
+  animation-delay: var(--md, 0s);
+}
+@keyframes mote {
+  0%   { opacity: 0; transform: translate3d(0, 0, 0); }
+  12%  { opacity: .5; }
+  80%  { opacity: .22; }
+  100% { opacity: 0; transform: translate3d(var(--dx, 24px), -62svh, 0); }
+}
+
+/* ---------- centre ---------- */
+.hero__center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: calc(var(--wall-h, 120px) + 6.5rem);
+  display: grid;
+  align-content: center;
+  padding-inline: var(--gutter);
+  transform:
+    translate3d(0, calc(var(--p) * -9svh), 0)
+    scale(calc(1 + var(--p) * .18));
+  text-align: center;
+  opacity: calc(1 - var(--p) * 2.6);
+  will-change: transform, opacity;
+}
+.hero__center > * { width: 100%; max-width: 44rem; margin-inline: auto; }
+
+.hero__meta { color: var(--ink-4); }
+
+.hero__title {
+  margin-top: .9rem;
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: var(--t-hero);
+  line-height: .92;
+  letter-spacing: .14em;
+  text-indent: .14em;
+  color: var(--ink);
+  text-shadow: 0 0 64px rgba(200,169,107,.14);
+  opacity: 0;
+  animation: heroIn 2.4s var(--cine) .35s both;
+}
+.hero__line {
+  margin-top: .4rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: var(--t-md);
+  color: var(--ink-3);
+  opacity: 0;
+  animation: heroIn 2.2s var(--cine) 1.1s both;
+}
+@keyframes heroIn {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+/* ---------- whispers ---------- */
+.hero__whisper {
+  position: relative;
+  margin-top: clamp(1.8rem, 5vh, 3rem);
+  height: 3.2em;
+}
+.hero__whisper p {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: var(--t-lg);
+  line-height: 1.3;
+  color: var(--ink);
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition: opacity 1.5s var(--cine), transform 1.5s var(--cine);
+  text-wrap: balance;
+}
+.hero__whisper p.is-on { opacity: 1; transform: none; }
+.hero__whisper p.is-off { opacity: 0; transform: translate3d(0, -10px, 0); }
+.hero__whisper.is-static { height: auto; display: grid; gap: .9rem; }
+.hero__whisper.is-static p { position: static; opacity: 1; transform: none; }
+
+/* ---------- scroll cue ---------- */
+.hero__scroll {
+  position: absolute;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--wall-h, 120px) + 1.2rem);
+  transform: translateX(-50%);
+  opacity: calc(1 - var(--p) * 5);
+}
+.hero__scroll-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .7rem;
+  opacity: 0;
+  animation: heroIn 1.6s var(--cine) 6.4s both;
+}
+.hero__scroll .meta { color: var(--ink-4); letter-spacing: .4em; }
+.hero__thread {
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(180deg, var(--hair-2), transparent);
+  overflow: hidden;
+}
+.hero__thread::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 16px;
+  background: var(--gold);
+  animation: threadRun 2.8s var(--soft) infinite;
+}
+@keyframes threadRun {
+  0%   { transform: translateY(-18px); opacity: 0; }
+  30%  { opacity: .9; }
+  100% { transform: translateY(46px); opacity: 0; }
+}
+
+/* ---------- the cut to black ---------- */
+.hero__void {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--bg-0);
+  opacity: calc((var(--p) - .68) / .26);
+}
+
+@media (max-width: 640px) {
+  .hero { height: 210vh; }
+  .hero__whisper { height: 4.6em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__title, .hero__line, .hero__scroll-in { opacity: 1; animation: none; }
+  .hero__dust { display: none; }
+  .hero__thread::after { animation: none; opacity: .5; }
+}
