@@ -1,10 +1,17 @@
 /* ============ KARM — 000 : THE RETURN ============ */
 
+/* The camera's progress. Written by Hero.js onto only the few elements that
+   move with it; not inherited, so a scroll frame never restyles the wall. */
+@property --p { syntax: "<number>"; inherits: false; initial-value: 0; }
+
 .hero {
   position: relative;
   height: 230vh;
-  --p: 0;
 }
+/* the wall gives way through the middle of the push */
+.hero__beyond,
+.hero__shade,
+.hero__wall .brick.is-gap { --open: clamp(0, (var(--p) - .3) / .4, 1); }
 
 .hero__sticky {
   position: sticky;
@@ -15,25 +22,63 @@
   background: var(--bg-0);
 }
 
+/* the room starts black; the clay's warmth arrives with the wall */
+@property --dawn { syntax: "<number>"; inherits: false; initial-value: 1; }
+
 .hero__atmos {
   position: absolute;
   inset: 0;
   background:
     radial-gradient(74% 46% at 50% 104%, rgba(166,107,77,.17), transparent 68%),
     radial-gradient(40% 30% at 50% 22%, rgba(200,169,107,.045), transparent 72%);
-  opacity: calc(.35 + var(--p) * .9);
+  opacity: calc((.35 + var(--p) * .9) * var(--dawn));
+  animation: heroDawn 6.5s var(--soft) .6s both;
+}
+@keyframes heroDawn {
+  from { --dawn: 0; }
+  to   { --dawn: 1; }
 }
 
 /* ---------- the wall ---------- */
 .hero__stage {
   position: absolute;
   inset: 0;
-  transform-origin: 50% 88%;
+  transform-origin: 50% calc(100% - var(--fy, 12%));
   transform:
-    translate3d(0, calc(var(--p) * 16vh), 0)
+    translate3d(0, calc(var(--p) * -38vh), 0)
     scale(calc(1 + var(--p) * 3.6));
   opacity: calc(1.25 - var(--p) * .55);
   will-change: transform;
+  /* a camera that is never quite still */
+  animation: heroDrift 26s var(--soft) 2s infinite alternate both;
+}
+.hero__stage.is-jolt {
+  animation:
+    heroDrift 26s var(--soft) 2s infinite alternate both,
+    heroJolt .42s var(--soft);
+}
+@keyframes heroDrift {
+  from { scale: 1; }
+  to   { scale: 1.016; }
+}
+@keyframes heroJolt {
+  0%, 100% { translate: 0 0; }
+  22%      { translate: 0 2px; }
+  50%      { translate: 0 -1px; }
+}
+
+/* what waits behind the wall: light, only ever seen through it */
+.hero__beyond {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 116%;
+  height: var(--wall-h, 120px);
+  transform: translateX(-50%);
+  background:
+    radial-gradient(9% 30% at 50% calc(100% - var(--fy, 100px)), rgb(255 236 196 / .95), rgb(var(--warm-hot) / .75) 45%, transparent 100%),
+    radial-gradient(26% 80% at 50% calc(100% - var(--fy, 100px)), rgb(var(--warm) / .5), rgb(var(--earth) / .22) 60%, transparent 100%);
+  opacity: calc(clamp(0, (var(--p) - .1) / .3, 1) * .4 + var(--open) * .6);
 }
 
 .hero__wall {
@@ -44,10 +89,13 @@
   transform: translateX(-50%);
 }
 /* the courses nearest the top sit back in the dark */
-.hero__wall::after {
-  content: "";
+.hero__shade {
   position: absolute;
-  left: 0; right: 0; top: 0; bottom: 0;
+  left: 50%;
+  bottom: 0;
+  width: 116%;
+  height: var(--wall-h, 120px);
+  transform: translateX(-50%);
   pointer-events: none;
   background:
     linear-gradient(180deg,
@@ -56,9 +104,17 @@
       rgba(8,7,6,.2) 92px,
       rgba(8,7,6,0) 160px),
     linear-gradient(180deg, transparent 58%, rgba(8,7,6,.42) 100%);
+  /* once the wall is breached its own light reaches the upper courses */
+  opacity: calc(1 - var(--open));
 }
 
 .hero__wall .brick { opacity: 0; }
+.hero__wall .brick.is-gap {
+  translate: calc(var(--gx) * var(--open)) calc(var(--gy) * var(--open));
+  scale: calc(1 - var(--gs) * var(--open));
+  rotate: calc(var(--gr) * var(--open));
+  filter: brightness(calc(1 - var(--open) * .7));
+}
 .hero__wall .brick.is-falling {
   animation: brickFall var(--dur, 820ms) both;
   animation-delay: var(--delay, 0ms);
@@ -145,6 +201,7 @@
 .hero__meta { color: var(--ink-4); }
 
 .hero__title {
+  max-width: none;
   margin-top: .9rem;
   font-family: var(--serif);
   font-weight: 300;
@@ -155,7 +212,7 @@
   color: var(--ink);
   text-shadow: 0 0 64px rgba(200,169,107,.14);
   opacity: 0;
-  animation: heroIn 2.4s var(--cine) .35s both;
+  animation: heroIn 2.4s var(--cine) .8s both;
 }
 .hero__line {
   margin-top: .4rem;
@@ -165,7 +222,7 @@
   font-size: var(--t-md);
   color: var(--ink-3);
   opacity: 0;
-  animation: heroIn 2.2s var(--cine) 1.1s both;
+  animation: heroIn 2.2s var(--cine) 1.7s both;
 }
 @keyframes heroIn {
   from { opacity: 0; transform: translate3d(0, 14px, 0); filter: blur(6px); }
@@ -212,7 +269,7 @@
   align-items: center;
   gap: .7rem;
   opacity: 0;
-  animation: heroIn 1.6s var(--cine) 6.4s both;
+  animation: heroIn 1.6s var(--cine) 7.5s both;
 }
 .hero__scroll .meta { color: var(--ink-4); letter-spacing: .4em; }
 .hero__thread {
@@ -241,7 +298,7 @@
   inset: 0;
   pointer-events: none;
   background: var(--bg-0);
-  opacity: calc((var(--p) - .68) / .26);
+  opacity: calc((var(--p) - .8) / .16);
 }
 
 @media (max-width: 640px) {
@@ -253,4 +310,9 @@
   .hero__title, .hero__line, .hero__scroll-in { opacity: 1; animation: none; }
   .hero__dust { display: none; }
   .hero__thread::after { animation: none; opacity: .5; }
+  /* no camera: the wall simply dims as you leave it */
+  .hero__stage { transform: none; opacity: calc(1 - var(--p) * 1.2); animation: none; }
+  .hero__atmos { animation: none; }
+  .hero__beyond { display: none; }
+  .hero__wall .brick.is-gap { translate: none; scale: none; rotate: none; filter: none; }
 }

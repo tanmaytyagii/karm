@@ -12,7 +12,11 @@ export function initFinalReturn() {
   const n = lines.length;
 
   onScene(antim, (p) => {
-    const idx = Math.min(n - 1, Math.floor(p * n));
-    lines.forEach((l, i) => l.classList.toggle("is-on", i === idx));
+    const x = p * n;
+    const idx = Math.min(n - 1, Math.floor(x));
+    const within = x - idx;
+    /* a held breath of black between lines; the couplet, once said, stays */
+    const said = within > 0.14 && (within < 0.86 || idx === n - 1);
+    lines.forEach((l, i) => l.classList.toggle("is-on", said && i === idx));
   });
 }

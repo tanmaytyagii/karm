@@ -18,17 +18,6 @@ export function initNavigation() {
     nav.classList.toggle("is-hidden", dir === "down" && y > 220);
   });
 
-  /* ---------- go dark for the final section ---------- */
-  /* antim is several screens tall, so its own intersection ratio never gets
-     high; watch a band across the middle of the viewport instead */
-  const antim = qs("#antim");
-  if (antim && "IntersectionObserver" in window) {
-    new IntersectionObserver(
-      ([e]) => nav.classList.toggle("is-gone", e.isIntersecting),
-      { rootMargin: "-45% 0px -45% 0px" }
-    ).observe(antim);
-  }
-
   /* ---------- current section ---------- */
   const targets = links
     .map((a) => ({ a, sec: qs(a.getAttribute("href")) }))

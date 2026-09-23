@@ -13,6 +13,8 @@ let queued = false;
 function tick() {
   queued = false;
   const vh = window.innerHeight;
+  /* measure every scene before writing any, so a write never forces a second layout */
+  const due = [];
   for (const s of scenes) {
     const r = s.el.getBoundingClientRect();
     if (r.bottom < -vh * 0.4 || r.top > vh * 1.4) continue;
@@ -20,10 +22,11 @@ function tick() {
     const p = span > 8
       ? clamp(-r.top / span)
       : clamp((vh * 0.8 - r.top) / (vh * 0.8));
-    if (Math.abs(p - s.last) > 0.0004) {
-      s.last = p;
-      s.cb(p);
-    }
+    if (Math.abs(p - s.last) > 0.0004) due.push([s, p]);
+  }
+  for (const [s, p] of due) {
+    s.last = p;
+    s.cb(p);
   }
 }
 

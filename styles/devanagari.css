@@ -57,6 +57,10 @@
 .deewar__mark:lang(hi)    { line-height: 1.48; }
 .antim__lines p:lang(hi)  { line-height: 1.48; }
 
+/* body-size Devanagari needs more than the light cut on a dark ground */
+.frag:lang(hi),
+.kahani__hint:lang(hi)    { font-weight: 400; }
+
 /* the hairline sits with the first line of a taller Devanagari line */
 .frag:lang(hi)::before { margin-top: .82em; }
 

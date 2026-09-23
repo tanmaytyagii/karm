@@ -11,6 +11,22 @@
 }
 .overlay.is-open .overlay__scrim { opacity: 1; }
 
+/* Each beat has its own light. The act is plain; the consequence arrives
+   cold from above; the return rises warm from below, gold as it is
+   everywhere in KARM. */
+.overlay__scrim::before,
+.overlay__scrim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.6s var(--soft);
+}
+.overlay__scrim::before { background: radial-gradient(80% 55% at 50% 0%, rgb(var(--cold) / .16), transparent 70%); }
+.overlay__scrim::after  { background: radial-gradient(90% 60% at 50% 100%, rgb(var(--warm) / .13), transparent 72%); }
+.overlay[data-beat="1"] .overlay__scrim::before,
+.overlay[data-beat="2"] .overlay__scrim::after { opacity: 1; }
+
 .overlay__panel {
   position: absolute;
   inset: 0;
@@ -29,6 +45,21 @@
   transition: opacity .7s var(--cine) .1s, transform .8s var(--cine) .1s;
 }
 .overlay.is-open .overlay__panel { opacity: 1; transform: none; }
+
+/* the player steps in: where you are, what it is, what happened, how to go on */
+.overlay__eyebrow,
+.overlay__title,
+.overlay__scene,
+.overlay__foot {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition: opacity .6s var(--cine), transform .8s var(--cine);
+}
+.overlay.is-open :is(.overlay__eyebrow, .overlay__title, .overlay__scene, .overlay__foot) { opacity: 1; transform: none; }
+.overlay.is-open .overlay__eyebrow { transition-delay: .2s; }
+.overlay.is-open .overlay__title   { transition-delay: .3s; }
+.overlay.is-open .overlay__scene   { transition-delay: .48s; }
+.overlay.is-open .overlay__foot    { transition-delay: .64s; }
 
 .overlay__close {
   position: absolute;
@@ -67,7 +98,9 @@
   padding-top: clamp(1rem, 3vw, 1.6rem);
   border-top: 1px solid var(--hair);
 }
-.overlay__label { color: var(--gold); letter-spacing: .38em; }
+.overlay__label { color: var(--ink-3); letter-spacing: .38em; transition: color .6s var(--soft); }
+.overlay[data-beat="2"] .overlay__label { color: var(--gold); }
+.overlay[data-beat="2"] .overlay__text { color: var(--gold-2); }
 .overlay__text {
   font-family: var(--serif);
   font-weight: 300;
@@ -76,11 +109,15 @@
   color: var(--ink);
   text-wrap: pretty;
 }
-.overlay__scene.is-swap .overlay__label,
-.overlay__scene.is-swap .overlay__text { opacity: 0; transform: translate3d(0, 10px, 0); }
 .overlay__label, .overlay__text {
-  transition: opacity .55s var(--soft), transform .6s var(--cine);
+  transition: opacity .55s var(--soft), transform .6s var(--cine), color .6s var(--soft);
 }
+/* forward: the old beat drifts up and out, the next rises into its place;
+   back: the other way round */
+.overlay__scene.is-swap :is(.overlay__label, .overlay__text) { opacity: 0; transform: translate3d(0, -8px, 0); }
+.overlay__scene.is-enter :is(.overlay__label, .overlay__text) { opacity: 0; transform: translate3d(0, 10px, 0); transition: none; }
+.overlay__scene[data-dir="back"].is-swap :is(.overlay__label, .overlay__text) { transform: translate3d(0, 8px, 0); }
+.overlay__scene[data-dir="back"].is-enter :is(.overlay__label, .overlay__text) { transform: translate3d(0, -10px, 0); }
 
 .overlay__foot {
   display: flex;
@@ -97,6 +134,7 @@
   background: var(--hair-2);
   transition: background-color .5s var(--soft);
 }
+.overlay__ticks i.is-past { background: rgb(var(--warm) / .38); }
 .overlay__ticks i.is-on { background: var(--gold); }
 .overlay__nav { display: flex; gap: .6rem; }
 

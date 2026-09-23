@@ -17,6 +17,7 @@
   box-shadow: 0 34px 100px -44px rgba(0,0,0,.95);
   --lit: 0;
 }
+/* the only thing behind the wall: light, growing as the wall comes down */
 .deewar__light {
   position: absolute;
   inset: 0;
@@ -26,32 +27,78 @@
   opacity: var(--lit);
   transition: opacity 1.4s var(--soft);
 }
+.deewar__light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(40% 46% at 50% 46%, rgb(255 238 206 / .55), transparent 72%);
+  opacity: calc((var(--lit) - .45) * 2);
+  transition: opacity 1.6s var(--soft);
+}
+/* and what comes through lights the floor in front of it */
+.deewar__wallwrap::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: 100%;
+  height: clamp(60px, 9vw, 110px);
+  pointer-events: none;
+  background: radial-gradient(50% 100% at 50% 0%, rgb(var(--warm) / .2), transparent 72%);
+  opacity: var(--lit);
+  transition: opacity 1.6s var(--soft);
+}
 .deewar__wall { position: relative; width: 100%; overflow: hidden; }
+/* weight: a deeper lip on every course */
+.deewar__wall .brick {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    inset 0 -3px 0 rgba(0,0,0,.26),
+    inset 0 -2px 6px rgba(0,0,0,.44),
+    inset 1px 0 0 rgba(0,0,0,.18),
+    0 3px 6px rgba(0,0,0,.5);
+}
 
 .deewar__wall .slot { background: transparent; box-shadow: none; }
 .deewar__wall .slot .brick {
   transform-origin: 50% 50%;
   transition: transform 1.15s var(--cine), opacity 1.05s var(--soft), filter .6s var(--soft);
 }
-.deewar__wall .slot .brick:hover { filter: brightness(1.2); }
+.deewar__wall .slot .brick:hover,
+.deewar__wall .slot .brick:focus-visible {
+  filter: brightness(1.2);
+  transform: translate3d(0, -1px, 0);
+  transition-duration: .45s;
+}
 .deewar__wall .slot .brick:hover .brick__word { color: var(--gold-2); }
 
-.deewar__wall .slot.is-gone { pointer-events: none; }
-.deewar__wall .slot.is-gone .brick {
-  opacity: 0;
-  transform:
-    perspective(620px)
-    translate3d(var(--ox, 5px), 9%, -130px)
-    rotate(var(--orot, 5deg))
-    scale(.9);
+.deewar__wall .slot.is-gone { pointer-events: none; z-index: 2; }
+/* drawn out toward you, then it drops away */
+.deewar__wall .slot.is-gone .brick { animation: brickPull 1s both; }
+@keyframes brickPull {
+  0%   { opacity: 1; transform: none; }
+  18%  { opacity: 1; transform: translate3d(0, -2px, 0) scale(1.06); animation-timing-function: var(--fall); }
+  100% { opacity: 0; transform: translate3d(var(--ox, 5px), 64px, 0) rotate(var(--orot, 5deg)) scale(.97); }
 }
+/* the gap it leaves, brighter the more of the wall is gone */
 .deewar__wall .slot.is-gone::after {
   content: "";
   position: absolute;
   inset: -1px;
-  background: radial-gradient(70% 80% at 50% 50%, rgba(216,190,131,.5), rgba(200,169,107,.12) 72%, transparent);
-  box-shadow: 0 0 20px rgba(216,190,131,.3);
-  animation: gapOpen 1.2s var(--soft) both;
+  z-index: -1;
+  background: radial-gradient(70% 80% at 50% 50%, rgb(var(--warm-hot) / calc(.42 + var(--lit) * .4)), rgb(var(--warm) / .12) 72%, transparent);
+  box-shadow: 0 0 20px rgb(var(--warm-hot) / calc(.24 + var(--lit) * .3));
+  animation: gapOpen 1.2s var(--soft) .18s both;
+}
+
+/* going back up, course by course (--rd, Deewar.js) */
+.deewar__wall.is-rebuilding .brick {
+  animation: brickReturn .62s var(--cine) both;
+  animation-delay: var(--rd, 0ms);
+}
+@keyframes brickReturn {
+  from { opacity: 0; transform: translate3d(0, -16px, 0); }
+  to   { opacity: 1; transform: none; }
 }
 @keyframes gapOpen {
   from { opacity: 0; }
@@ -76,6 +123,7 @@
   transition: opacity 1s var(--cine), transform 1s var(--cine);
 }
 .frag.is-in { opacity: 1; transform: none; }
+.frag:last-child { color: var(--ink-2); }
 .frag.is-out { opacity: 0; transform: translate3d(0, -8px, 0); }
 .frag::before { content: ""; height: 1px; margin-top: .75em; background: var(--gold); opacity: .5; }
 
@@ -93,6 +141,8 @@
 .deewar__mark.is-in { opacity: 1; transform: none; }
 
 .deewar__side .btn { justify-self: start; }
+/* the wall is gone: building it again is the one thing left to do */
+.deewar__side .btn.is-invite { color: var(--ink); border-color: rgb(var(--warm) / .5); }
 
 @media (max-width: 900px) {
   .deewar__stage { grid-template-columns: 1fr; }

@@ -61,13 +61,29 @@ export function place(node, cell) {
   return node;
 }
 
+/* Where the fired clay went darker and where it caught the light, so no two
+   faces share the same texture. */
+function surface() {
+  return {
+    "--tx1": `${rand(8, 42).toFixed(0)}%`,
+    "--ty1": `${rand(15, 70).toFixed(0)}%`,
+    "--tx2": `${rand(55, 92).toFixed(0)}%`,
+    "--ty2": `${rand(35, 85).toFixed(0)}%`,
+    "--ts": rand(0.34, 0.66).toFixed(2)
+  };
+}
+
 /* A plain brick face. */
 export function brick(extra = "") {
-  const b = el("span", { class: `brick ${extra}`.trim(), vars: tone() });
+  const b = el("span", { class: `brick ${extra}`.trim(), vars: { ...tone(), ...surface() } });
   if (Math.random() < 0.06) {
     b.classList.add("is-cracked");
     b.style.setProperty("--crack", `${rand(-7, 7).toFixed(1)}deg`);
   }
+  /* a knocked corner; never on buttons, where it would clip the focus ring */
+  const chip = Math.random();
+  if (chip < 0.05) b.classList.add("is-chipped");
+  else if (chip < 0.09) b.classList.add("is-chipped", "is-chipped--low");
   return b;
 }
 
@@ -80,7 +96,7 @@ export function slot(cell, word, label) {
       type: "button",
       class: "brick",
       "aria-label": label,
-      vars: tone(0.64, 0.96)
+      vars: { ...tone(0.64, 0.96), ...surface() }
     },
     [el("span", { class: "brick__word", lang: "hi", text: word })]
   );

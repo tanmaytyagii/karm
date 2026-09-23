@@ -20,6 +20,8 @@ export function initKahaniyan() {
     ]);
 
     btn.addEventListener("click", () => {
+      /* stories you have watched keep a mark in the index */
+      btn.classList.add("is-seen");
       sound.tick();
       openStory({
         eyebrow: `कहानी / ${pad(i + 1, 3)}`,
@@ -29,5 +31,15 @@ export function initKahaniyan() {
     });
 
     list.append(el("li", {}, btn));
+  });
+
+  /* an index reads top to bottom: arrows move through it, Home / End jump */
+  list.addEventListener("keydown", (e) => {
+    const items = [...list.querySelectorAll(".kahani")];
+    const at = items.indexOf(document.activeElement);
+    const to = { ArrowDown: at + 1, ArrowUp: at - 1, Home: 0, End: items.length - 1 }[e.key];
+    if (at < 0 || to == null) return;
+    e.preventDefault();
+    items[Math.max(0, Math.min(items.length - 1, to))].focus();
   });
 }

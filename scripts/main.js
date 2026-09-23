@@ -2,6 +2,7 @@
 
 import { watchReveals } from "./lib/motion.js";
 import { initNavigation } from "./components/Navigation.js";
+import { initAtmosphere } from "./components/Atmosphere.js";
 import { initOverlay } from "./components/StoryOverlay.js";
 import { initHero } from "./components/Hero.js";
 import { initMohalla } from "./components/Mohalla.js";
@@ -15,6 +16,7 @@ import { initFinalReturn } from "./components/FinalReturn.js";
 const boot = [
   initOverlay,
   initNavigation,
+  initAtmosphere,
   initHero,
   initMohalla,
   initHisaab,

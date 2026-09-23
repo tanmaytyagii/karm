@@ -18,22 +18,31 @@ function outside() {
 
 function render(animate = true) {
   const s = seq.scenes[step];
+  const motion = animate && !reduced();
 
   const paint = () => {
     labelEl.textContent = s.label;
     textEl.textContent = s.text;
+    root.dataset.beat = String(step);
     scene.classList.remove("is-swap");
+    if (!motion) return;
+    /* place the new beat on the far side without a transition, then let it arrive */
+    scene.classList.add("is-enter");
+    requestAnimationFrame(() => requestAnimationFrame(() => scene.classList.remove("is-enter")));
   };
 
   clearTimeout(swapTimer);
-  if (animate && !reduced()) {
+  if (motion) {
     scene.classList.add("is-swap");
     swapTimer = setTimeout(paint, 280);
   } else {
     paint();
   }
 
-  [...ticksEl.children].forEach((t, i) => t.classList.toggle("is-on", i === step));
+  [...ticksEl.children].forEach((t, i) => {
+    t.classList.toggle("is-on", i === step);
+    t.classList.toggle("is-past", i < step);
+  });
 
   prevBtn.disabled = step === 0;
   const last = step === seq.scenes.length - 1;
@@ -45,6 +54,7 @@ function go(dir) {
   if (next < 0) return;
   if (next >= seq.scenes.length) return close();
   step = next;
+  scene.dataset.dir = dir > 0 ? "on" : "back";
   sound.tick();
   render();
 }

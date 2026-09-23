@@ -33,9 +33,10 @@ export const fragments = [
   "हिसाब पूरा हुआ। बताया किसी ने नहीं।"
 ];
 
+/* the last mark waits for the last brick, however many the wall holds */
 export const marks = [
   { at: 4,  text: "जितनी ईंटें हटीं, उतना अंदर दिखा।" },
   { at: 10, text: "पीछे कोई और नहीं था। सिर्फ़ रोशनी थी।" },
-  { at: 17, text: "ये दीवार तुमने ही बनाई थी।" },
-  { at: 24, text: "अब कुछ नहीं बचा छुपाने के लिए।" }
+  { at: 17, text: "अब कुछ नहीं बचा छुपाने के लिए।" },
+  { at: 24, text: "ये दीवार तुमने ही बनाई थी।" }
 ];

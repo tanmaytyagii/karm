@@ -27,9 +27,12 @@
 }
 .nav.is-lifted::before { opacity: 1; }
 .nav.is-hidden { transform: translate3d(0, -130%, 0); }
-.nav.is-gone { opacity: 0; transform: translate3d(0, -130%, 0); }
+/* the final room has no navigation (see Atmosphere.js) */
+[data-room="antim"] .nav { opacity: 0; transform: translate3d(0, -130%, 0); pointer-events: none; }
+[data-room="antim"] .nav > * { pointer-events: none; }
 
 .nav__mark {
+  padding-block: .35rem;
   font-family: var(--mono);
   font-size: var(--t-mono);
   font-weight: 400;
@@ -47,12 +50,13 @@
 }
 .nav__links a {
   position: relative;
+  padding-block: .3rem;
   font-family: var(--mono);
   font-size: var(--t-mono);
   letter-spacing: .28em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--ink-4);
+  color: var(--ink-3);
   transition: color .4s var(--soft);
 }
 .nav__links a::after {
@@ -60,7 +64,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -7px;
+  bottom: -2px;
   height: 1px;
   background: var(--gold);
   transform: scaleX(0);
@@ -82,7 +86,7 @@
   background: none;
   border: 0;
   cursor: pointer;
-  color: var(--ink-4);
+  color: var(--ink-3);
   transition: color .4s var(--soft);
 }
 .sound:hover, .sound[aria-pressed="true"] { color: var(--ink-2); }
@@ -123,7 +127,7 @@
   font-size: var(--t-mono);
   letter-spacing: .28em;
   text-transform: uppercase;
-  color: var(--ink-4);
+  color: var(--ink-3);
   transition: color .4s var(--soft);
 }
 .burger:hover { color: var(--ink); }
@@ -167,4 +171,11 @@
   .nav__links { display: none; }
   .burger { display: inline-block; }
   .sound__label { display: none; }
+}
+
+/* fingers, not cursors: every control in the bar is at least 44px */
+@media (pointer: coarse) {
+  .nav__mark { display: inline-block; min-width: 44px; padding-block: .9rem; }
+  .sound { min-width: 44px; min-height: 44px; justify-content: center; }
+  .burger { min-width: 44px; padding: .9rem .5rem; }
 }

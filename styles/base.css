@@ -21,10 +21,17 @@
   --gold:#C8A96B;
   --gold-2:#D8BE83;
 
+  /* Light always has a source: a lamp, a window, the kiln brick, the room
+     behind the wall. Channels, so every glow can set its own alpha. */
+  --warm:200 169 107;
+  --warm-hot:216 190 131;
+  --earth:110 64 48;
+  --cold:92 98 108;
+
   /* ink */
   --ink:#F2EBDD;
   --ink-2:#B9B0A2;
-  --ink-3:rgba(185,176,162,.58);
+  --ink-3:rgba(185,176,162,.68);  /* 4.7:1 on --bg-0: secondary text stays readable */
   --ink-4:rgba(185,176,162,.32);
   --hair:rgba(242,235,221,.09);
   --hair-2:rgba(242,235,221,.16);
@@ -106,6 +113,15 @@ svg { display: block; }
 }
 .skip:focus-visible { transform: none; }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ---------- atmosphere ---------- */
 .grain {
   position: fixed;
@@ -117,7 +133,11 @@ svg { display: block; }
   background-size: 160px 160px;
   will-change: transform;
   animation: grainDrift 1.05s steps(5) infinite;
+  transition: opacity 2.4s var(--soft);
 }
+/* the mirror is quieter than the lane; the end has no grain at all */
+[data-room="aaina"] .grain { opacity: .028; }
+[data-room="antim"] .grain { opacity: 0; }
 @keyframes grainDrift {
   0%   { transform: translate3d(0,0,0); }
   20%  { transform: translate3d(-22px,10px,0); }
@@ -194,7 +214,7 @@ svg { display: block; }
 }
 .btn:hover { color: var(--ink); border-color: rgba(200,169,107,.45); background: rgba(200,169,107,.05); }
 .btn[disabled] { opacity: .32; pointer-events: none; }
-.btn--ghost { border-color: transparent; color: var(--ink-4); }
+.btn--ghost { border-color: transparent; color: var(--ink-3); }
 .btn--ghost:hover { border-color: var(--hair); background: transparent; }
 
 /* ---------- scroll reveal ---------- */
@@ -224,10 +244,13 @@ svg { display: block; }
   position: absolute;
   inset: 0;
   border-radius: 1px;
-  opacity: .5;
+  opacity: var(--ts, .5);
   background-image:
-    radial-gradient(60% 120% at 18% 30%, rgba(0,0,0,.24), transparent 60%),
-    radial-gradient(40% 90% at 78% 72%, rgba(255,255,255,.05), transparent 65%);
+    radial-gradient(60% 120% at var(--tx1, 18%) var(--ty1, 30%), rgba(0,0,0,.24), transparent 60%),
+    radial-gradient(40% 90% at var(--tx2, 78%) var(--ty2, 72%), rgba(255,255,255,.05), transparent 65%),
+    radial-gradient(1.5px 1.5px at var(--tx2, 31%) var(--ty1, 44%), rgba(0,0,0,.5), transparent),
+    radial-gradient(1px 1px at var(--tx1, 68%) var(--ty2, 26%), rgba(0,0,0,.45), transparent),
+    radial-gradient(1.5px 1.5px at calc(100% - var(--tx1, 17%)) calc(100% - var(--ty1, 39%)), rgba(0,0,0,.4), transparent);
 }
 .brick.is-cracked::after {
   content: "";
@@ -239,6 +262,8 @@ svg { display: block; }
   background: rgba(0,0,0,.3);
   transform: rotate(var(--crack, 4deg));
 }
+.brick.is-chipped { clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 45%, 100% 100%, 0 100%); }
+.brick.is-chipped--low { clip-path: polygon(0 0, 100% 0, 100% 100%, 9px 100%, 0 58%); }
 
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {

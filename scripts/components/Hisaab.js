@@ -2,7 +2,7 @@
 
 import { qs, el } from "../lib/dom.js";
 import { layout, place, brick, slot, spread } from "../lib/wall.js";
-import { debounce } from "../lib/motion.js";
+import { debounce, reduced } from "../lib/motion.js";
 import { actions } from "../../data/actions.js";
 import * as sound from "../lib/sound.js";
 
@@ -38,7 +38,8 @@ export function initHisaab() {
         "div",
         {
           class: `trio__step${r.big ? " trio__head" : ""}${r.ret ? " trio__step--return" : ""}`,
-          vars: { "--d": String(i * 240) }
+          /* the account waits for the brick to swing clear */
+          vars: { "--d": String(380 + i * 260) }
         },
         [
           el("p", { class: "meta", text: r.label }),
@@ -51,12 +52,18 @@ export function initHisaab() {
     requestAnimationFrame(() => rowsOut.forEach((n) => n.classList.add("is-in")));
   }
 
+  function shut(holder) {
+    holder.classList.remove("is-open");
+    holder.querySelector(".brick").setAttribute("aria-expanded", "false");
+  }
+
   function close() {
     if (!openHolder) return;
-    openHolder.classList.remove("is-open");
-    openHolder.querySelector(".brick").setAttribute("aria-expanded", "false");
+    shut(openHolder);
     openHolder = null;
     hint();
+    /* it seats back into the course */
+    setTimeout(() => sound.thud(0.3), reduced() ? 0 : 760);
   }
 
   function build() {
@@ -93,14 +100,11 @@ export function initHisaab() {
       btn.setAttribute("aria-expanded", "false");
       btn.addEventListener("click", () => {
         if (openHolder === holder) return close();
-        if (openHolder) {
-          openHolder.classList.remove("is-open");
-          openHolder.querySelector(".brick").setAttribute("aria-expanded", "false");
-        }
+        if (openHolder) shut(openHolder);
         holder.classList.add("is-open");
         btn.setAttribute("aria-expanded", "true");
         openHolder = holder;
-        sound.thud(0.55);
+        sound.scrape(0.9);
         show(a);
       });
       wallEl.append(holder);
@@ -111,11 +115,15 @@ export function initHisaab() {
 
   build();
   window.addEventListener("resize", debounce(build, 260));
-  wallEl.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && openHolder) {
-      const btn = openHolder.querySelector(".brick");
-      close();
-      btn.focus();
-    }
+  /* Escape shuts the open brick. Safari does not focus a clicked button, so
+     the key may come from the page itself rather than from the wall. */
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || !openHolder) return;
+    const at = document.activeElement;
+    const inWall = wallEl.contains(at);
+    if (!inWall && at && at !== document.body && at.id !== "main") return;
+    const btn = openHolder.querySelector(".brick");
+    close();
+    if (inWall) btn.focus();
   });
 }

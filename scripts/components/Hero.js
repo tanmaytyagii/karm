@@ -7,20 +7,47 @@ import * as sound from "../lib/sound.js";
 
 const ROWS = 6;
 const MOTES = 14;
+const LEAD = 1800; /* the dark holds, and the title arrives before the first brick */
 
 const target = () =>
   Math.max(46, Math.min(96, window.innerWidth * 0.068));
 
+/* The bricks around the camera's focus give way as it arrives: knocked
+   inward, apart and down into the dark, so the push ends in the gap. */
+function loosen(b, dx, dy, k, bw) {
+  const d = Math.hypot(dx, dy) || 1;
+  const push = bw * (0.16 + 0.3 * k);
+  const drop = bw * 0.5 * k;
+  b.classList.add("is-gap");
+  b.style.setProperty("--gx", `${((dx / d) * push).toFixed(1)}px`);
+  b.style.setProperty("--gy", `${((-dy / d) * push * 0.6 + drop).toFixed(1)}px`);
+  b.style.setProperty("--gs", (0.14 + 0.5 * k).toFixed(3));
+  b.style.setProperty("--gr", `${rand(-7, 7).toFixed(1)}deg`);
+}
+
 export function initHero() {
   const hero = qs("#hero");
   const wall = qs("#heroWall");
+  const stage = qs(".hero__stage", hero);
   const whisper = qs("#heroWhisper");
   const dustHost = qs("#heroDust");
-  if (!hero || !wall) return;
+  if (!hero || !wall || !stage) return;
 
   let played = false;
   let lastWidth = 0;
   let timers = [];
+  let progress = 0;
+
+  /* everything that moves with the camera; the loosened bricks join after each lay */
+  const fixed = [...hero.querySelectorAll(".hero__atmos, .hero__stage, .hero__beyond, .hero__shade, .hero__center, .hero__scroll, .hero__void")];
+  let takers = fixed;
+  const film = () => takers.forEach((n) => n.style.setProperty("--p", progress));
+
+  /* weight: the camera takes a little of each of the first landings */
+  function jolt() {
+    stage.classList.add("is-jolt");
+    timers.push(setTimeout(() => stage.classList.remove("is-jolt"), 450));
+  }
 
   function lay(animate) {
     const geo = layout(wall, {
@@ -35,14 +62,28 @@ export function initHero() {
     wall.textContent = "";
     lastWidth = window.innerWidth;
     hero.style.setProperty("--wall-h", `${geo.height}px`);
+    const gap = [];
+
+    /* the camera pushes in on the middle of the wall (.hero__stage's origin) */
+    const fx = wall.clientWidth / 2;
+    const fy = geo.height / 2;
+    hero.style.setProperty("--fy", `${fy.toFixed(0)}px`);
 
     geo.cells.forEach((cell, i) => {
       const b = place(brick(), cell);
       b.append(el("span", { class: "dust" }));
 
+      const dx = cell.left + cell.w / 2 - fx;
+      const dy = cell.bottom + cell.h / 2 - fy;
+      const e = (dx / (geo.bw * 1.35)) ** 2 + (dy / (geo.bh * 1.8)) ** 2;
+      if (e < 1) {
+        loosen(b, dx, dy, 1 - e, geo.bw);
+        gap.push(b);
+      }
+
       if (animate) {
         /* the first three land alone, so you hear each one */
-        const delay = i < 3 ? 700 + i * 1150 : 4150 + (i - 3) * 34 + rand(-14, 14);
+        const delay = i < 3 ? LEAD + i * 1150 : LEAD + 3450 + (i - 3) * 34 + rand(-14, 14);
         const dur = i < 3 ? 1050 : 800;
         b.style.setProperty("--delay", `${Math.round(delay)}ms`);
         b.style.setProperty("--dur", `${dur}ms`);
@@ -50,7 +91,10 @@ export function initHero() {
         b.classList.add("is-falling");
         if (i < 3) {
           timers.push(
-            setTimeout(() => sound.thud(i === 0 ? 1 : 0.78), delay + dur * 0.66)
+            setTimeout(() => {
+              sound.thud(i === 0 ? 1 : 0.78);
+              jolt();
+            }, delay + dur * 0.66)
           );
         }
       } else {
@@ -60,6 +104,8 @@ export function initHero() {
       wall.append(b);
     });
 
+    takers = fixed.concat(gap);
+    film();
     return geo;
   }
 
@@ -73,12 +119,12 @@ export function initHero() {
       return;
     }
 
-    timers.push(setTimeout(() => one.classList.add("is-on"), 4400));
+    timers.push(setTimeout(() => one.classList.add("is-on"), LEAD + 3700));
     timers.push(setTimeout(() => {
       one.classList.remove("is-on");
       one.classList.add("is-off");
-    }, 7600));
-    timers.push(setTimeout(() => two.classList.add("is-on"), 8050));
+    }, LEAD + 6900));
+    timers.push(setTimeout(() => two.classList.add("is-on"), LEAD + 7350));
   }
 
   /* ---------- dust in the lamp light ---------- */
@@ -123,6 +169,7 @@ export function initHero() {
       if (Math.abs(window.innerWidth - lastWidth) < 44) return;
       timers.forEach(clearTimeout);
       timers = [];
+      stage.classList.remove("is-jolt");
       lay(false);
       if (whisper && !reduced()) {
         whisper.children[1].classList.add("is-on");
@@ -132,5 +179,8 @@ export function initHero() {
   );
 
   /* ---------- the camera ---------- */
-  onScene(hero, (p) => hero.style.setProperty("--p", p.toFixed(4)));
+  onScene(hero, (p) => {
+    progress = p.toFixed(4);
+    film();
+  });
 }

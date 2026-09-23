@@ -24,13 +24,19 @@ export function skyline(host, list, { far = false, flicker = true } = {}) {
       const lit = new Set(b.lit || []);
       for (let i = 0; i < b.wins; i++) {
         const cls = ["win"];
+        let passAt = null;
         if (lit.has(i)) {
           cls.push("win--lit");
           if (Math.random() < 0.34) cls.push("win--warm");
           if (Math.random() < 0.3) cls.push("win--shadow");
+          else if (flicker && Math.random() < 0.12) {
+            /* someone crosses the room, now and then */
+            cls.push("win--pass");
+            passAt = `${rand(0, 24).toFixed(1)}s`;
+          }
           if (flicker && Math.random() < 0.18) cls.push("win--flicker");
         }
-        wins.append(el("span", { class: cls.join(" ") }));
+        wins.append(el("span", { class: cls.join(" "), vars: passAt ? { "--pd": passAt } : {} }));
       }
       node.append(wins);
     }
@@ -42,6 +48,8 @@ export function skyline(host, list, { far = false, flicker = true } = {}) {
     if (b.door) {
       node.append(el("span", { class: `bldg__door${b.open ? " bldg__door--open" : ""}` }));
     }
+
+    if (b.roof) node.append(el("span", { class: `bldg__roof bldg__roof--${b.roof}` }));
 
     host.append(node);
   });
